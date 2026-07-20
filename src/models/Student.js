@@ -47,6 +47,17 @@ const studentSchema = new mongoose.Schema(
     birthDate: {
       type: Date,
     },
+    status: {
+      type: String,
+      enum: ["active", "inactive", "graduated", "dropped_out"],
+      default: "active",
+      index: true,
+    },
+    statusReason: {
+      type: String,
+      trim: true,
+      maxlength: 250,
+    },
   },
   {
     timestamps: true,

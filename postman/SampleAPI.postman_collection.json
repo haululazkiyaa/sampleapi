@@ -1,287 +1,10 @@
 {
   "info": {
     "_postman_id": "b1e3b9fd-cf83-4c29-8f10-88f9a82656a5",
-    "name": "SampleAPI - CRUD Mahasiswa",
-    "description": "Postman collection for Node.js + Express + MongoDB API with JWT auth and student CRUD.",
+    "name": "SampleAPI - Student API",
+    "description": "Collection for the six primary student endpoints: resource detail, creation, filtered collection, state transition, bulk upsert, and analytics. Run Login first to populate the collection token.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
-  "item": [
-    {
-      "name": "Health Check",
-      "request": {
-        "method": "GET",
-        "header": [],
-        "url": {
-          "raw": "{{baseUrl}}/health",
-          "host": ["{{baseUrl}}"],
-          "path": ["health"]
-        },
-        "description": "Check API health status."
-      },
-      "response": []
-    },
-    {
-      "name": "Auth",
-      "item": [
-        {
-          "name": "Register",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/register",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "register"]
-            },
-            "description": "Register user and receive bearer token."
-          },
-          "response": []
-        },
-        {
-          "name": "Login",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 200\", function () {",
-                  "  pm.response.to.have.status(200);",
-                  "});",
-                  "",
-                  "let jsonData = {};",
-                  "try {",
-                  "  jsonData = pm.response.json();",
-                  "} catch (e) {}",
-                  "",
-                  "if (jsonData && jsonData.data && jsonData.data.token) {",
-                  "  pm.collectionVariables.set(\"token\", jsonData.data.token);",
-                  "  pm.collectionVariables.set(\"tokenType\", jsonData.data.tokenType || \"Bearer\");",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/auth/login",
-              "host": ["{{baseUrl}}"],
-              "path": ["auth", "login"]
-            },
-            "description": "Login and auto-save token to collection variable."
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Students",
-      "item": [
-        {
-          "name": "Get All Students (Pagination)",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/students?page={{page}}&limit={{limit}}&search={{search}}&sortBy={{sortBy}}&sortOrder={{sortOrder}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["students"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "{{page}}"
-                },
-                {
-                  "key": "limit",
-                  "value": "{{limit}}"
-                },
-                {
-                  "key": "search",
-                  "value": "{{search}}"
-                },
-                {
-                  "key": "sortBy",
-                  "value": "{{sortBy}}"
-                },
-                {
-                  "key": "sortOrder",
-                  "value": "{{sortOrder}}"
-                }
-              ]
-            },
-            "description": "Get student list with pagination, search, and sorting."
-          },
-          "response": []
-        },
-        {
-          "name": "Create Student",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status code is 201\", function () {",
-                  "  pm.response.to.have.status(201);",
-                  "});",
-                  "",
-                  "let jsonData = {};",
-                  "try {",
-                  "  jsonData = pm.response.json();",
-                  "} catch (e) {}",
-                  "",
-                  "if (jsonData && jsonData.data && jsonData.data._id) {",
-                  "  pm.collectionVariables.set(\"studentId\", jsonData.data._id);",
-                  "}"
-                ],
-                "type": "text/javascript"
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"nim\": \"2300012345\",\n  \"name\": \"Budi Santoso\",\n  \"email\": \"budi.santoso@example.com\",\n  \"major\": \"Teknik Informatika\",\n  \"semester\": 4,\n  \"gpa\": 3.62,\n  \"birthDate\": \"2004-01-15\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/students",
-              "host": ["{{baseUrl}}"],
-              "path": ["students"]
-            },
-            "description": "Create new student record."
-          },
-          "response": []
-        },
-        {
-          "name": "Get Student By ID",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/students/{{studentId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["students", "{{studentId}}"]
-            },
-            "description": "Get a single student by Mongo ObjectId."
-          },
-          "response": []
-        },
-        {
-          "name": "Update Student By ID",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"major\": \"Sistem Informasi\",\n  \"semester\": 5,\n  \"gpa\": 3.75\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/students/{{studentId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["students", "{{studentId}}"]
-            },
-            "description": "Update selected fields of student record."
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Student By ID",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/students/{{studentId}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["students", "{{studentId}}"]
-            },
-            "description": "Delete student by ObjectId."
-          },
-          "response": []
-        }
-      ]
-    }
-  ],
   "auth": {
     "type": "bearer",
     "bearer": [
@@ -292,43 +15,374 @@
       }
     ]
   },
+  "item": [
+    {
+      "name": "Setup",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Checks whether the API process and database connection are available."
+          },
+          "response": []
+        },
+        {
+          "name": "Register",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Optional setup request. A duplicate email returns 409."
+          },
+          "response": []
+        },
+        {
+          "name": "Login and Save Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", () => pm.response.to.have.status(200));",
+                  "const response = pm.response.json();",
+                  "pm.expect(response.success).to.eql(true);",
+                  "pm.expect(response.data.token).to.be.a(\"string\").and.not.empty;",
+                  "pm.collectionVariables.set(\"token\", response.data.token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"Password123\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticates and stores the JWT in the collection-level token variable."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6 Core Endpoints",
+      "description": "Two easy, two medium, and two complex student API structures.",
+      "item": [
+        {
+          "name": "Easy - Create Student",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = Date.now().toString().slice(-10);",
+                  "pm.collectionVariables.set(\"newStudentNim\", `PM${suffix}`);",
+                  "pm.collectionVariables.set(\"newStudentEmail\", `postman.${suffix}@example.com`);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Student is created\", () => pm.response.to.have.status(201));",
+                  "const response = pm.response.json();",
+                  "pm.expect(response.success).to.eql(true);",
+                  "pm.expect(response.data).to.include.all.keys(\"_id\", \"nim\", \"email\", \"status\");",
+                  "pm.collectionVariables.set(\"studentId\", response.data._id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nim\": \"{{newStudentNim}}\",\n  \"name\": \"Postman Student\",\n  \"email\": \"{{newStudentEmail}}\",\n  \"major\": \"Informatics\",\n  \"semester\": 4,\n  \"gpa\": 3.62,\n  \"birthDate\": \"2004-01-15\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"]
+            },
+            "description": "Creates a student. NIM and email are generated before each request to avoid unique-key conflicts. Saves _id as studentId. Validation: NIM 5-30 chars, valid email, semester 1-14, GPA 0-4, and ISO birth date."
+          },
+          "response": []
+        },
+        {
+          "name": "Easy - Get Student by ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Student is returned\", () => pm.response.to.have.status(200));",
+                  "const response = pm.response.json();",
+                  "pm.expect(response.data._id).to.eql(pm.collectionVariables.get(\"studentId\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "{{studentId}}"]
+            },
+            "description": "Returns one student. Invalid ObjectId produces 422; a valid but unknown ObjectId produces 404."
+          },
+          "response": []
+        },
+        {
+          "name": "Medium - Filter and Paginate Students",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Paginated collection is returned\", () => pm.response.to.have.status(200));",
+                  "const response = pm.response.json();",
+                  "pm.expect(response.data).to.be.an(\"array\");",
+                  "pm.expect(response.meta).to.include.all.keys(\"page\", \"limit\", \"totalItems\", \"totalPages\", \"hasNextPage\", \"hasPrevPage\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students?page={{page}}&limit={{limit}}&search={{search}}&major={{major}}&semester={{semester}}&gpaMin={{gpaMin}}&gpaMax={{gpaMax}}&status={{status}}&sortBy={{sortBy}}&sortOrder={{sortOrder}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students"],
+              "query": [
+                { "key": "page", "value": "{{page}}" },
+                { "key": "limit", "value": "{{limit}}" },
+                { "key": "search", "value": "{{search}}", "disabled": true },
+                { "key": "major", "value": "{{major}}" },
+                { "key": "semester", "value": "{{semester}}", "disabled": true },
+                { "key": "gpaMin", "value": "{{gpaMin}}" },
+                { "key": "gpaMax", "value": "{{gpaMax}}" },
+                { "key": "status", "value": "{{status}}" },
+                { "key": "sortBy", "value": "{{sortBy}}" },
+                { "key": "sortOrder", "value": "{{sortOrder}}" }
+              ]
+            },
+            "description": "Combines pagination, optional search, exact major/status/semester filters, GPA range, and sorting. Disable optional parameters when they are not needed. Inverted GPA ranges return 422."
+          },
+          "response": []
+        },
+        {
+          "name": "Medium - Transition Student Status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status transition succeeds\", () => pm.response.to.have.status(200));",
+                  "const response = pm.response.json();",
+                  "pm.expect(response.data.previousStatus).to.eql(\"active\");",
+                  "pm.expect(response.data.status).to.eql(\"inactive\");"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"inactive\",\n  \"reason\": \"academic leave\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "{{studentId}}", "status"]
+            },
+            "description": "Transitions the student created earlier from active to inactive. reason is required for inactive and dropped_out. Same-state and forbidden transitions return 409."
+          },
+          "response": []
+        },
+        {
+          "name": "Complex - Bulk Upsert (Partial)",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const suffix = Date.now().toString().slice(-10);",
+                  "pm.collectionVariables.set(\"bulkSuffix\", suffix);"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Partial result reports success and failure\", () => pm.response.to.have.status(200));",
+                  "const response = pm.response.json();",
+                  "pm.expect(response.data.summary.received).to.eql(2);",
+                  "pm.expect(response.data.summary.failed).to.eql(1);",
+                  "pm.expect(response.data.results[1].errors).to.be.an(\"array\").and.not.empty;"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"matchBy\": \"nim\",\n  \"mode\": \"partial\",\n  \"students\": [\n    {\n      \"nim\": \"BULK{{bulkSuffix}}\",\n      \"name\": \"Valid Bulk Student\",\n      \"email\": \"bulk.{{bulkSuffix}}@example.com\",\n      \"major\": \"Data Science\",\n      \"semester\": 6,\n      \"gpa\": 3.81\n    },\n    {\n      \"nim\": \"BAD{{bulkSuffix}}\",\n      \"name\": \"Invalid Bulk Student\",\n      \"email\": \"not-an-email\",\n      \"major\": \"Data Science\",\n      \"semester\": 20,\n      \"gpa\": 5\n    }\n  ]\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/bulk-upsert",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "bulk-upsert"]
+            },
+            "description": "Demonstrates per-item results: the first item is processed and the second deliberately fails validation. Change mode to atomic to roll back the whole batch on any failure; atomic mode requires MongoDB transaction support. Maximum 100 items."
+          },
+          "response": []
+        },
+        {
+          "name": "Complex - Student Analytics",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Analytics structure is returned\", () => pm.response.to.have.status(200));",
+                  "const response = pm.response.json();",
+                  "pm.expect(response.data).to.include.all.keys(\"summary\", \"distribution\", \"statusBreakdown\");",
+                  "pm.expect(response.data.distribution).to.be.an(\"array\");",
+                  "pm.expect(response.meta.groupBy).to.eql(pm.collectionVariables.get(\"groupBy\"));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/analytics?major={{major}}&status={{status}}&semesterFrom={{semesterFrom}}&semesterTo={{semesterTo}}&gpaMin={{gpaMin}}&gpaMax={{gpaMax}}&groupBy={{groupBy}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "analytics"],
+              "query": [
+                { "key": "major", "value": "{{major}}" },
+                { "key": "status", "value": "{{status}}" },
+                { "key": "semesterFrom", "value": "{{semesterFrom}}" },
+                { "key": "semesterTo", "value": "{{semesterTo}}" },
+                { "key": "gpaMin", "value": "{{gpaMin}}" },
+                { "key": "gpaMax", "value": "{{gpaMax}}" },
+                { "key": "groupBy", "value": "{{groupBy}}" }
+              ]
+            },
+            "description": "Returns summary, grouped distribution, and status breakdown. groupBy accepts major, semester, or status. Empty datasets return 200 with zero/null summary values."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Supporting Endpoints",
+      "item": [
+        {
+          "name": "Update Student by ID",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"semester\": 5,\n  \"gpa\": 3.75\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "{{studentId}}"]
+            },
+            "description": "Updates one or more general student fields."
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Student by ID",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["students", "{{studentId}}"]
+            },
+            "description": "Deletes the selected student. Run last because later ID-based requests will return 404."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
   "event": [],
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:3000/api/v1"
-    },
-    {
-      "key": "token",
-      "value": ""
-    },
-    {
-      "key": "tokenType",
-      "value": "Bearer"
-    },
-    {
-      "key": "studentId",
-      "value": ""
-    },
-    {
-      "key": "page",
-      "value": "1"
-    },
-    {
-      "key": "limit",
-      "value": "10"
-    },
-    {
-      "key": "search",
-      "value": ""
-    },
-    {
-      "key": "sortBy",
-      "value": "createdAt"
-    },
-    {
-      "key": "sortOrder",
-      "value": "desc"
-    }
+    { "key": "baseUrl", "value": "http://localhost:3000/api/v1", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "studentId", "value": "", "type": "string" },
+    { "key": "newStudentNim", "value": "", "type": "string" },
+    { "key": "newStudentEmail", "value": "", "type": "string" },
+    { "key": "bulkSuffix", "value": "", "type": "string" },
+    { "key": "page", "value": "1", "type": "string" },
+    { "key": "limit", "value": "10", "type": "string" },
+    { "key": "search", "value": "", "type": "string" },
+    { "key": "major", "value": "Informatics", "type": "string" },
+    { "key": "semester", "value": "4", "type": "string" },
+    { "key": "semesterFrom", "value": "1", "type": "string" },
+    { "key": "semesterTo", "value": "8", "type": "string" },
+    { "key": "gpaMin", "value": "2.5", "type": "string" },
+    { "key": "gpaMax", "value": "4", "type": "string" },
+    { "key": "status", "value": "active", "type": "string" },
+    { "key": "sortBy", "value": "gpa", "type": "string" },
+    { "key": "sortOrder", "value": "desc", "type": "string" },
+    { "key": "groupBy", "value": "semester", "type": "string" }
   ]
 }

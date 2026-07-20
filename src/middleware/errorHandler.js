@@ -1,4 +1,5 @@
 const { ZodError } = require("zod");
+const ApiError = require("../utils/apiError");
 const { sendError } = require("../utils/apiResponse");
 
 function errorHandler(err, _req, res, _next) {
@@ -59,11 +60,23 @@ function errorHandler(err, _req, res, _next) {
     });
   }
 
+  if (err instanceof ApiError) {
+    return sendError(res, {
+      statusCode: err.statusCode,
+      message: err.message,
+      errors: err.errors,
+    });
+  }
+
   const statusCode = err.statusCode || 500;
+  const message =
+    isProduction && statusCode >= 500
+      ? "Internal Server Error"
+      : err.message || "Internal Server Error";
 
   return sendError(res, {
     statusCode,
-    message: err.message || "Internal Server Error",
+    message,
     errors: !isProduction && err.errors ? err.errors : undefined,
   });
 }
